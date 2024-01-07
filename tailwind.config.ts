@@ -46,6 +46,7 @@ export default {
     plugin(({ addBase, theme }) => {
       addBase({
         html: {
+          touchAction: "manipulation",
           color: theme("colors.text-primary"),
           backgroundColor: theme("colors.secondary"),
         },
