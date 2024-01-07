@@ -14,6 +14,7 @@
     "@remix-run/react": "^2.4.1",
     "cross-env": "^7.0.3",
     "firebase": "^10.7.1",
+    "isbot": "^4.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
