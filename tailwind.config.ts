@@ -5,6 +5,9 @@ export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      height: {
+        "app-bar": "var(--app-bar)",
+      },
       colors: (theme) => ({
         primary: theme.colors.zinc[700],
         secondary: theme.colors.zinc[800],
