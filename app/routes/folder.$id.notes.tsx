@@ -22,7 +22,7 @@ import { Suspense, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ScrollArea";
 import { LoaderScreen } from "@/components/LoaderScreen";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = ({ params }: LoaderFunctionArgs) => {
   if (params.id == null) return redirect("/404");
 
   const notes = getNotes(params.id) as Promise<any[]>;

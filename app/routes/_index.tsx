@@ -9,12 +9,7 @@ import { Await, Link, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
 
 export const loader = async () => {
-  const folders = Folder.getAll().then((data) => {
-    return new Promise<any[]>((res) => {
-      setTimeout(() => res(data), 2000);
-    });
-  });
-
+  const folders = Folder.getAll();
   return defer({
     folders,
   });
@@ -51,4 +46,3 @@ export default function Index() {
     </>
   );
 }
-
