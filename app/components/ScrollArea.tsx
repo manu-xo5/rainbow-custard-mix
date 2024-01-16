@@ -7,7 +7,7 @@ export function ScrollArea({
   return (
     <div
       className={
-        "h-[calc(100vh-var(--app-bar))] overflow-y-scroll " + className
+        "h-[calc(100dvh-var(--app-bar))] overflow-y-scroll " + className
       }
       {...props}
     />
