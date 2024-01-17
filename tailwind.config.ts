@@ -34,6 +34,9 @@ export default {
         6.5: "1.625rem",
         19: "76px",
       },
+      fontFamily: {
+        DEFAULT: "monospace"
+      },
       fontSize: {
         title: ["1.125rem", { lineHeight: "1.3em" }],
         sm: ["0.875rem", { lineHeight: "1.2em" }],
