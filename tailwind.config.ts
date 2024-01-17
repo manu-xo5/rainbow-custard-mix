@@ -4,6 +4,9 @@ import type { Config } from "tailwindcss";
 export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    fontFamily: {
+      "sans": ["monospace"],
+    },
     extend: {
       height: {
         "app-bar": "var(--app-bar)",
@@ -33,9 +36,6 @@ export default {
       width: {
         6.5: "1.625rem",
         19: "76px",
-      },
-      fontFamily: {
-        DEFAULT: "monospace"
       },
       fontSize: {
         title: ["1.125rem", { lineHeight: "1.3em" }],
