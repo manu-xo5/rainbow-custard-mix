@@ -1,14 +1,9 @@
+import * as React from "react";
 import Navbar from "@/components/Navbar";
 import BackIcon from "@/icons/BackIcon";
-import {
-  addNote,
-  deleteNotes,
-  getFolder,
-  getNotes,
-  updateNote,
-} from "@/lib/api";
+import { addNote, deleteNotes, getNotes, updateNote } from "@/lib/api";
 import type { ActionFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect, json, defer } from "@remix-run/node";
+import { redirect, defer } from "@remix-run/node";
 import {
   Await,
   Form,
@@ -26,12 +21,8 @@ export const loader = ({ params }: LoaderFunctionArgs) => {
   if (params.id == null) return redirect("/404");
 
   const notes = getNotes(params.id) as Promise<any[]>;
-  const folder = getFolder(params.id);
 
-  return defer({
-    folder,
-    notes,
-  });
+  return defer({ notes });
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -64,12 +55,12 @@ export const action: ActionFunction = async ({ request }) => {
 export default function Notes() {
   const params = useParams();
   const loaderData = useLoaderData<typeof loader>();
-  const { folder, notes } = loaderData;
+  const { notes } = loaderData;
   const submit = useSubmit();
   const timerRef = useRef(0);
+  const [selected, setSelected] = React.useState<string[]>([]);
 
-  const [mode, setMode] = useState("idle");
-  // const [selected, setSelected] = useState<string[]>([]);
+  console.log(selected);
 
   return (
     <>
@@ -95,9 +86,6 @@ export default function Notes() {
                     method="POST"
                     className="notes-form m-5"
                   >
-                    <input type="hidden" name="folder_id" value={params.id} />
-                    <input type="hidden" name="note_id" value={note.id} />
-
                     <div
                       className="grow-wrap text-base leading-[24px]"
                       data-replicated-value={note.note}
@@ -106,14 +94,20 @@ export default function Notes() {
                         id={note.id}
                         onKeyUp={(e) => {
                           clearTimeout(timerRef.current);
-                          let id = setTimeout(
-                            submit,
-                            1000,
-                            e.currentTarget.form,
-                            {
+                          const elem = e.currentTarget.form!;
+                          let id = setTimeout(() => {
+                            const formData: any = Object.fromEntries(
+                              new FormData(elem)
+                            );
+
+                            formData.folder_id = params.id;
+                            formData.note_id = note.id;
+
+                            submit(formData, {
+                              method: "post",
                               replace: true,
-                            }
-                          );
+                            });
+                          }, 1000);
                           timerRef.current = id as unknown as number;
                         }}
                         onChange={(e) => {
@@ -121,17 +115,12 @@ export default function Notes() {
                             e.currentTarget.value;
                         }}
                         name="note"
-                        style={{
-                          backgroundColor:
-                            // folder.accentColor !== "#000000"
-                            //   ? folder.accentColor
-                            //   :
-                            "#777",
-                        }}
                         className="target gradiant rounded-sm w-full block outline-none"
-                      >
-                        {note.note}
-                      </textarea>
+                        style={{
+                          backgroundColor: "#777",
+                        }}
+                        defaultValue={note.note}
+                      />
                     </div>
                   </Form>
                 ))}
