@@ -63,7 +63,8 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function Notes() {
   const params = useParams();
-  const { folder, notes } = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
+  const { folder, notes } = loaderData;
   const submit = useSubmit();
   const timerRef = useRef(0);
 
@@ -79,124 +80,61 @@ export default function Notes() {
             <BackIcon />
           </Link>
         }
-        right={
-          mode === "idle" ? (
-            <button
-              type="button"
-              onClick={() => setMode("delete")}
-              name="yoops"
-              className="text-base"
-            >
-              Edit
-            </button>
-          ) : (
-            <button
-              form="main"
-              name="_action"
-              value="delete_notes"
-              className="text-base"
-            >
-              Delete
-            </button>
-          )
-        }
       />
 
       <Suspense fallback={<LoaderScreen />}>
-        <Await
-          resolve={Promise.all([notes, folder])}
-          errorElement={"server error"}
-        >
-          {([notes, folder]) => (
+        <Await resolve={notes} errorElement={"server error"}>
+          {(notes) => (
             <ScrollArea>
               <div id="notes-list">
-                {mode === "delete" ? (
-                  <>
-                    <Form
-                      id="main"
-                      action="."
-                      method="POST"
-                      className="notes-form"
-                    >
-                      <input type="hidden" name="folder_id" value={params.id} />
+                {notes.map((note: any) => (
+                  <Form
+                    id="main"
+                    action="."
+                    key={note.id}
+                    method="POST"
+                    className="notes-form m-5"
+                  >
+                    <input type="hidden" name="folder_id" value={params.id} />
+                    <input type="hidden" name="note_id" value={note.id} />
 
-                      {notes.map((note: any) => (
-                        <div
-                          key={note.id}
-                          className="m-5 grow-wrap text-base leading-[24px]"
-                          data-replicated-value={note.note}
-                        >
-                          <label
-                            style={{
-                              backgroundColor:
-                                folder.accentColor !== "#000000"
-                                  ? folder.accentColor
-                                  : "#777",
-                            }}
-                            className="target whitespace-pre-wrap gradiant rounded-sm w-full block outline-0 select-none outline-accent"
-                          >
-                            {note.note}
-                            <input
-                              hidden
-                              type="checkbox"
-                              name="selected_notes"
-                              value={note.id}
-                            />
-                          </label>
-                        </div>
-                      ))}
-                    </Form>
-                  </>
-                ) : (
-                  notes.map((note: any) => (
-                    <Form
-                      id="main"
-                      action="."
-                      key={note.id}
-                      method="POST"
-                      className="notes-form m-5"
+                    <div
+                      className="grow-wrap text-base leading-[24px]"
+                      data-replicated-value={note.note}
                     >
-                      <input type="hidden" name="folder_id" value={params.id} />
-                      <input type="hidden" name="note_id" value={note.id} />
-
-                      <div
-                        className="grow-wrap text-base leading-[24px]"
-                        data-replicated-value={note.note}
+                      <textarea
+                        id={note.id}
+                        onKeyUp={(e) => {
+                          clearTimeout(timerRef.current);
+                          let id = setTimeout(
+                            submit,
+                            1000,
+                            e.currentTarget.form,
+                            {
+                              replace: true,
+                            }
+                          );
+                          timerRef.current = id as unknown as number;
+                        }}
+                        onChange={(e) => {
+                          e.currentTarget.parentElement!.dataset.replicatedValue =
+                            e.currentTarget.value;
+                        }}
+                        name="note"
+                        style={{
+                          backgroundColor:
+                            // folder.accentColor !== "#000000"
+                            //   ? folder.accentColor
+                            //   :
+                            "#777",
+                        }}
+                        className="target gradiant rounded-sm w-full block outline-none"
                       >
-                        <textarea
-                          disabled={mode === "delete"}
-                          id={note.id}
-                          onKeyUp={(e) => {
-                            clearTimeout(timerRef.current);
-                            let id = setTimeout(
-                              submit,
-                              1000,
-                              e.currentTarget.form,
-                              {
-                                replace: true,
-                              }
-                            );
-                            timerRef.current = id as unknown as number;
-                          }}
-                          onInput={(e) => {
-                            e.currentTarget.parentElement!.dataset.replicatedValue =
-                              e.currentTarget.value;
-                          }}
-                          name="note"
-                          style={{
-                            backgroundColor:
-                              folder.accentColor !== "#000000"
-                                ? folder.accentColor
-                                : "#777",
-                          }}
-                          className="target gradiant rounded-sm w-full block outline-none"
-                        >
-                          {note.note}
-                        </textarea>
-                      </div>
-                    </Form>
-                  ))
-                )}
+                        {note.note}
+                      </textarea>
+                    </div>
+                  </Form>
+                ))}
 
                 <Form method="POST" className="notes-form m-5">
                   <input type="hidden" name="folder_id" value={params.id} />
