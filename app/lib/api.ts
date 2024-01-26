@@ -40,6 +40,10 @@ class Folder {
       return [];
     }
   }
+
+  static async createFolder(body) {
+    addDoc(collection(db, "folders"), body);
+  }
 }
 
 export { Folder };

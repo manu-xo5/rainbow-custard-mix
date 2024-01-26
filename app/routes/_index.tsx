@@ -22,11 +22,21 @@ export default function Index() {
     <>
       <Navbar
         left={
-          <Link to="/" className="aspect-square place-items-center">
+          <Link
+            to="/folder/create"
+            className="aspect-square place-items-center"
+          >
             <AddIcon />
           </Link>
         }
-        right={null}
+        right={
+          <Link
+            to="/edit"
+            className="aspect-square place-items-center"
+          >
+            Edit
+          </Link>
+        }
         title="Memo"
       />
 

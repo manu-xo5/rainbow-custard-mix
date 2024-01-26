@@ -1,25 +1,26 @@
-import * as React from 'react'
+import { cn } from "@/lib/utils";
+import * as React from "react";
 
 type Props = {
-  icon: any
-  title: any
-  last_note: any
-  last_updated_at: any
-}
+  className?: string;
+  title: any;
+  last_note: any;
+  last_updated_at: any;
+};
 
-export default function FolderCard({ icon, title, last_note, last_updated_at }: Props) {
+export default function FolderCard({
+  className,
+  title,
+  last_note,
+  last_updated_at,
+}: Props) {
   return (
-    <div className="bg-primary p-4 mx-5 my-4 rounded-lg flex gap-x-4">
-      <span
-        className="flex items-center aspect-square"
-        style={{
-          fontSize: '44px',
-          lineHeight: '44px',
-        }}
-      >
-        {icon}
-      </span>
-
+    <div
+      className={cn(
+        "bg-primary p-4 mx-5 my-4 rounded-lg flex gap-x-4",
+        className
+      )}
+    >
       <span className="grow text-border  min-w-0 truncate">
         <span className="text-text-primary flex justify-between text-xl">
           {title}
@@ -30,5 +31,5 @@ export default function FolderCard({ icon, title, last_note, last_updated_at }: 
         <span className="whitespace-nowrap">{last_note}</span>
       </span>
     </div>
-  )
+  );
 }
