@@ -1,5 +1,6 @@
 import FolderCard from "@/components/FolderCard";
 import Navbar from "@/components/Navbar";
+import { ScrollArea } from "@/components/ScrollArea";
 import { Folder } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ActionFunction } from "@remix-run/node";
@@ -76,35 +77,33 @@ export default function DeletePage() {
         }
       />
 
-      <main className="max-h-[calc(100dvh-var(--app-bar))] overflow-y-scroll">
+      <ScrollArea className="max-h-[calc(100dvh-var(--app-bar))] overflow-y-scroll">
         {selected.length === 0 ? (
           <p className="px-6 pt-4 font-bold  text-primary">No Item Selected</p>
         ) : (
           <p className="px-6 pt-4 font-bold">Selected: {selected.length}</p>
         )}
 
-        {folderList
-          .flatMap((x) => [x, x, x, x, x])
-          .map((folder) => (
-            <button
-              key={folder.id}
-              onClick={() =>
-                dispatch({ type: "toggle", payload: { id: folder.id } })
-              }
-              className="!block w-full"
-            >
-              <FolderCard
-                className={cn(
-                  "border-transparent border-2",
-                  selected.includes(folder.id) && "!border-purple-500"
-                )}
-                title={folder.title}
-                last_note={undefined}
-                last_updated_at={undefined}
-              />
-            </button>
-          ))}
-      </main>
+        {folderList.map((folder) => (
+          <button
+            key={folder.id}
+            onClick={() =>
+              dispatch({ type: "toggle", payload: { id: folder.id } })
+            }
+            className="!block w-full"
+          >
+            <FolderCard
+              className={cn(
+                "border-transparent border-2 !my-2",
+                selected.includes(folder.id) && "!border-purple-500"
+              )}
+              title={folder.title}
+              last_note={undefined}
+              last_updated_at={undefined}
+            />
+          </button>
+        ))}
+      </ScrollArea>
     </>
   );
 }

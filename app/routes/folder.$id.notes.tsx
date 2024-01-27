@@ -1,7 +1,7 @@
 import * as React from "react";
 import Navbar from "@/components/Navbar";
 import BackIcon from "@/icons/BackIcon";
-import { addNote, deleteNotes, getNotes, updateNote } from "@/lib/api";
+import { Folder, addNote, deleteNotes, getNotes, updateNote } from "@/lib/api";
 import type { ActionFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect, defer } from "@remix-run/node";
 import {
@@ -17,17 +17,28 @@ import { Suspense, useRef } from "react";
 import { ScrollArea } from "@/components/ScrollArea";
 import { LoaderScreen } from "@/components/LoaderScreen";
 
-export const loader = ({ params }: LoaderFunctionArgs) => {
+/** GET **/
+export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (params.id == null) return redirect("/404");
 
   const notes = getNotes(params.id) as Promise<any[]>;
+  const folder = await Folder.get(params.id);
 
-  return defer({ notes });
+  return defer({ notes, folder });
 };
 
+/** POST **/
 export const action: ActionFunction = async ({ request }) => {
   const fd = await request.formData();
-  if (fd.get("_action") === "new_note") {
+  if (fd.get("_action") === "update_folder") {
+    const title = fd.get("title")?.toString();
+    const folderId = fd.get("folderId")?.toString();
+
+    if (!title || !folderId)
+      throw Error("title or folderId is not typeof String");
+
+    await Folder.updateFolder({ title, folderId });
+  } else if (fd.get("_action") === "new_note") {
     await O.pipe(
       0,
       () => Object.fromEntries(fd) as Record<string, string>,
@@ -52,12 +63,14 @@ export const action: ActionFunction = async ({ request }) => {
   return null;
 };
 
+/** CLIENT **/
 export default function Notes() {
   const params = useParams();
   const loaderData = useLoaderData<typeof loader>();
-  const { notes } = loaderData;
+  const { notes, folder } = loaderData;
   const submit = useSubmit();
   const timerRef = useRef(0);
+  const [selected, setSelected] = React.useState([]);
 
   return (
     <>
@@ -70,10 +83,39 @@ export default function Notes() {
         }
       />
 
-      <Suspense fallback={<LoaderScreen />}>
-        <Await resolve={notes} errorElement={"server error"}>
-          {(notes) => (
-            <ScrollArea>
+      <ScrollArea>
+        <Suspense fallback={<LoaderScreen />}>
+          <Await resolve={folder} errorElement={"server error"}>
+            {(folder) => (
+              <div className="flex gap-2 items-center px-2 mx-6 mt-4 border border-primary rounded focus:border-accent">
+                <span>Folder:</span>
+                <input
+                  type="text"
+                  spellCheck="false"
+                  className="flex-1 py-1 font-bold bg-transparent outline-none"
+                  defaultValue={folder?.title}
+                  onChange={(ev) => {
+                    submit(
+                      {
+                        _action: "update_folder",
+                        title: ev.target.value,
+                        folderId: params.id!,
+                      },
+                      {
+                        method: "POST",
+                        encType: "multipart/form-data",
+                      }
+                    );
+                  }}
+                />
+              </div>
+            )}
+          </Await>
+        </Suspense>
+
+        <Suspense fallback={<LoaderScreen />}>
+          <Await resolve={notes} errorElement={"server error"}>
+            {(notes) => (
               <div id="notes-list">
                 {notes.map((note: any) => (
                   <Form
@@ -131,10 +173,10 @@ export default function Notes() {
                   </button>
                 </Form>
               </div>
-            </ScrollArea>
-          )}
-        </Await>
-      </Suspense>
+            )}
+          </Await>
+        </Suspense>
+      </ScrollArea>
     </>
   );
 }

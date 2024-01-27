@@ -1,11 +1,12 @@
 import plugin from "tailwindcss/plugin";
 import type { Config } from "tailwindcss";
+import tailwindScrollbar from "tailwind-scrollbar";
 
 export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      "sans": ["monospace"],
+      sans: ["monospace"],
     },
     extend: {
       height: {
@@ -46,6 +47,7 @@ export default {
     },
   },
   plugins: [
+    tailwindScrollbar,
     plugin(({ addBase, theme }) => {
       addBase({
         html: {

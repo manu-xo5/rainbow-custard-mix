@@ -37,8 +37,29 @@ class Folder {
     }
   }
 
+  static async get(folderId: string) {
+    try {
+      const docRef = doc(collection(db, "folders"), folderId);
+      const folder = await getDoc(docRef);
+      return folder.data();
+    } catch (err) {
+      console.log("[service getFolders()]");
+      console.error(err);
+      return undefined;
+    }
+  }
+
   static async createFolder(body: { title: string }) {
-    addDoc(collection(db, "folders"), body);
+    await addDoc(collection(db, "folders"), body);
+  }
+
+  static async updateFolder(body: { folderId: string; title: string }) {
+    try {
+      const docRef = doc(collection(db, "folders"), body.folderId);
+      await setDoc(docRef, { title: body.title }, { merge: true });
+    } catch {
+      return;
+    }
   }
 
   static async deleteFolders(body: { folderList: string[] }) {
@@ -57,27 +78,6 @@ class Folder {
 }
 
 export { Folder };
-
-export function getFolder(id: string) {
-  return O.pipe(
-    0,
-    O.tryCatch(() => getDoc(doc(collection(db, "folders"), id))),
-    O.bind((x) => x.data())
-  );
-}
-
-export function saveFolder(body: {
-  icon: string;
-  title: string;
-  first_note?: string;
-  accentColor: string;
-}) {
-  return O.pipe(
-    body,
-    filter<ObjectValues<typeof body>>(Boolean),
-    O.tryCatch((x: any) => addDoc(collection(db, "folders"), x))
-  );
-}
 
 export function getNotes(id: string) {
   return O.pipe(
@@ -124,10 +124,3 @@ export function deleteNotes(body: Record<string, any[]>) {
     O.bind(Boolean)
   );
 }
-
-type ObjectValues<T> = T[keyof T];
-
-const filter =
-  <T>(fn: (x: T) => boolean) =>
-  (x: T) =>
-    Object.fromEntries<T>(Object.entries(x).filter(([_, value]) => fn(value)));
