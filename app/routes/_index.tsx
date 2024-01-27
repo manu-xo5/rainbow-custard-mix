@@ -30,10 +30,7 @@ export default function Index() {
           </Link>
         }
         right={
-          <Link
-            to="/edit"
-            className="aspect-square place-items-center"
-          >
+          <Link to="/edit" className="aspect-square place-items-center">
             Edit
           </Link>
         }

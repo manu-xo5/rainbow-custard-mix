@@ -13,7 +13,7 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import * as O from "@/lib/O";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useRef } from "react";
 import { ScrollArea } from "@/components/ScrollArea";
 import { LoaderScreen } from "@/components/LoaderScreen";
 
@@ -58,9 +58,6 @@ export default function Notes() {
   const { notes } = loaderData;
   const submit = useSubmit();
   const timerRef = useRef(0);
-  const [selected, setSelected] = React.useState<string[]>([]);
-
-  console.log(selected);
 
   return (
     <>

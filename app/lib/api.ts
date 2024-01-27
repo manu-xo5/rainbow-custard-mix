@@ -1,8 +1,5 @@
 import {
   doc,
-  orderBy,
-  query,
-  deleteDoc,
   getDocs,
   addDoc,
   setDoc,
@@ -12,7 +9,6 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 import * as O from "./O";
-import { updateCacheControl } from "@/lib/cacheControl";
 
 const notesCollectionFor = (folderId: string) =>
   collection(db, "folders", folderId, "notes");
@@ -41,8 +37,22 @@ class Folder {
     }
   }
 
-  static async createFolder(body) {
+  static async createFolder(body: { title: string }) {
     addDoc(collection(db, "folders"), body);
+  }
+
+  static async deleteFolders(body: { folderList: string[] }) {
+    const docIdsToDelete = body.folderList;
+
+    const batch = writeBatch(db);
+
+    docIdsToDelete.forEach((docId) => {
+      const docRef = doc(collection(db, "folders"), docId);
+
+      batch.delete(docRef);
+    });
+
+    await batch.commit();
   }
 }
 

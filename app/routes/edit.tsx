@@ -12,6 +12,7 @@ import {
 } from "@remix-run/react";
 import * as React from "react";
 
+// GET
 export const loader = async () => {
   const folderList = await Folder.getAll();
 
@@ -20,11 +21,15 @@ export const loader = async () => {
   });
 };
 
+// POST
 export const action: ActionFunction = async ({ request }) => {
-  const body = request.json();
+  const body: { folderList: string[] } = await request.json();
+  await Folder.deleteFolders(body);
+
   return redirect("/");
 };
 
+// CLIENT
 const reducer = (
   state = [] as string[],
   action: { type: "toggle"; payload: { id: string } }
@@ -51,7 +56,7 @@ export default function DeletePage() {
             type="button"
             onClick={() => {
               fetcher.submit(
-                { folderId: selected },
+                { folderList: selected },
                 {
                   action: "/edit",
                   encType: "application/json",
@@ -71,32 +76,34 @@ export default function DeletePage() {
         }
       />
 
-      {selected.length === 0 ? (
-        <p className="px-6 pt-4 font-bold  text-primary">No Item Selected</p>
-      ) : (
-        <p className="px-6 pt-4 font-bold">Selected: {selected.length}</p>
-      )}
+      <main className="max-h-[calc(100dvh-var(--app-bar))] overflow-y-scroll">
+        {selected.length === 0 ? (
+          <p className="px-6 pt-4 font-bold  text-primary">No Item Selected</p>
+        ) : (
+          <p className="px-6 pt-4 font-bold">Selected: {selected.length}</p>
+        )}
 
-      <main className="">
-        {folderList.map((folder) => (
-          <button
-            key={folder.id}
-            onClick={() =>
-              dispatch({ type: "toggle", payload: { id: folder.id } })
-            }
-            className="!block w-full"
-          >
-            <FolderCard
-              className={cn(
-                "border-transparent border-2",
-                selected.includes(folder.id) && "!border-purple-500"
-              )}
-              title={folder.title}
-              last_note={undefined}
-              last_updated_at={undefined}
-            />
-          </button>
-        ))}
+        {folderList
+          .flatMap((x) => [x, x, x, x, x])
+          .map((folder) => (
+            <button
+              key={folder.id}
+              onClick={() =>
+                dispatch({ type: "toggle", payload: { id: folder.id } })
+              }
+              className="!block w-full"
+            >
+              <FolderCard
+                className={cn(
+                  "border-transparent border-2",
+                  selected.includes(folder.id) && "!border-purple-500"
+                )}
+                title={folder.title}
+                last_note={undefined}
+                last_updated_at={undefined}
+              />
+            </button>
+          ))}
       </main>
     </>
   );

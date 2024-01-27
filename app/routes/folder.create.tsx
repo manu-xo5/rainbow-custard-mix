@@ -6,9 +6,13 @@ import { Form, Link, redirect, useNavigation } from "@remix-run/react";
 export const action: ActionFunction = async ({ request }) => {
   try {
     const fd = await request.formData();
-    const body = Object.fromEntries(fd);
-    await new Promise((res) => setTimeout(res, 500));
-    await Folder.createFolder(body);
+    const title = fd.get("title")?.toString();
+
+    if (!title) {
+      throw new Error("title isn't type of string | number");
+    }
+
+    await Folder.createFolder({ title });
 
     return redirect("/");
   } catch (err) {
