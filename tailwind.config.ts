@@ -6,7 +6,7 @@ export default {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      sans: ["monospace"],
+      sans: ["Space Mono", "monospace"],
     },
     extend: {
       height: {
