@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import * as React from "react";
 
 type Props = {
   className?: string;
@@ -9,7 +8,7 @@ type Props = {
 };
 
 export default function FolderCard({
-  className,
+  className = "",
   title,
   last_note,
   last_updated_at,
@@ -17,12 +16,12 @@ export default function FolderCard({
   return (
     <div
       className={cn(
-        "bg-primary p-4 mx-5 my-4 rounded-lg flex gap-x-4",
+        "bg-primary px-2 py-1 mx-5 my-4 rounded flex gap-x-4",
         className
       )}
     >
       <span className="grow text-border  min-w-0 truncate">
-        <span className="text-text-primary flex justify-between text-xl">
+        <span className="text-text-primary flex justify-between">
           {title}
 
           <span className="text-base">{last_updated_at}</span>
