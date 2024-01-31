@@ -1,4 +1,3 @@
-import * as React from "react";
 import Navbar from "@/components/Navbar";
 import BackIcon from "@/icons/BackIcon";
 import { Folder, addNote, deleteNotes, getNotes, updateNote } from "@/lib/api";
@@ -9,6 +8,7 @@ import {
   Form,
   Link,
   useLoaderData,
+  useNavigation,
   useParams,
   useSubmit,
 } from "@remix-run/react";
@@ -16,6 +16,7 @@ import * as O from "@/lib/O";
 import { Suspense, useRef } from "react";
 import { ScrollArea } from "@/components/ScrollArea";
 import { LoaderScreen } from "@/components/LoaderScreen";
+import Loader from "@/icons/Loader";
 
 /** GET **/
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -70,21 +71,27 @@ export default function Notes() {
   const { notes, folder } = loaderData;
   const submit = useSubmit();
   const timerRef = useRef(0);
-  const [selected, setSelected] = React.useState([]);
+  const { state } = useNavigation();
 
   return (
     <>
       <Navbar
         title="Memo"
         left={
-          <Link to="/" className="aspect-square place-items-center">
-            <BackIcon />
-          </Link>
+          state === "submitting" ? (
+            <span className="aspect-square place-items-center">
+              <Loader />
+            </span>
+          ) : (
+            <Link to="/" className="aspect-square place-items-center">
+              <BackIcon />
+            </Link>
+          )
         }
       />
 
       <ScrollArea>
-        <Suspense fallback={<LoaderScreen />}>
+        <Suspense fallback={null}>
           <Await resolve={folder} errorElement={"server error"}>
             {(folder) => (
               <div className="flex gap-2 items-center px-2 mx-6 mt-4 border border-primary rounded focus:border-accent">
