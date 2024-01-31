@@ -138,6 +138,7 @@ export default function Notes() {
                     >
                       <textarea
                         id={note.id}
+                        spellCheck="false"
                         onKeyUp={(e) => {
                           clearTimeout(timerRef.current);
                           const elem = e.currentTarget.form!;
